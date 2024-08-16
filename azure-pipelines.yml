@@ -7,7 +7,7 @@ trigger:
 - main
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: windows-latest
 
 variables:
   rgName: 'rg-devopsdemo2402'
@@ -41,7 +41,7 @@ stages:
               condition: and(succeeded(), contains(variables['Build.SourceBranch'], 'refs/heads/main'))
               displayName: Copy Bicep files to artifacts
               inputs:
-                SourceFolder: '**/bicep/*'
+                SourceFolder: 'bicep'
                 TargetFolder: $(build.ArtifactStagingDirectory)/Bicep
             - task: PublishBuildArtifacts@1
               condition: and(succeeded(), contains(variables['Build.SourceBranch'], 'refs/heads/main'))
