@@ -88,7 +88,7 @@ resource azureFunction 'Microsoft.Web/sites@2020-12-01' = {
         }
         {
           name: 'FUNCTIONS_WORKER_RUNTIME'
-          value: 'dotnet'
+          value: 'dotnet-isolated'
         }
       ]
     }
