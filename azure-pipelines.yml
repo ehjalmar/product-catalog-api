@@ -9,6 +9,10 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+variables:
+  rgName: 'rg-devopsdemo2402'
+  webappName: 'fnccb2402'
+
 stages:
     - stage: Build_Test
       displayName: 'Build and Test'
@@ -26,3 +30,55 @@ stages:
               inputs:
                 command: 'test'
                 projects: '**/*Tests/*.csproj'
+            - task: DotNetCoreCLI@2
+              condition: and(succeeded(), contains(variables['Build.SourceBranch'], 'refs/heads/main'))
+              inputs:
+                command: 'publish'
+                publishWebProjects: false
+                projects: '**/ProductCatalogAPI.csproj'
+                arguments: --output $(Build.ArtifactStagingDirectory)
+            - task: CopyFiles@2
+              condition: and(succeeded(), contains(variables['Build.SourceBranch'], 'refs/heads/main'))
+              displayName: Copy Bicep files to artifacts
+              inputs:
+                SourceFolder: 'Bicep'
+                TargetFolder: $(build.ArtifactStagingDirectory)/Bicep
+            - task: PublishBuildArtifacts@1
+              condition: and(succeeded(), contains(variables['Build.SourceBranch'], 'refs/heads/main'))
+              inputs:
+                PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+                ArtifactName: 'productcatalogapi-drop'
+                publishLocation: 'Container'
+  
+    - stage: Deploy
+      dependsOn: Build_Test
+      condition: and(succeeded(), contains(variables['Build.SourceBranch'], 'refs/heads/main'))        
+      jobs:
+        - deployment:
+          environment: DEV
+          strategy:
+            runOnce:
+              deploy: 
+                steps:
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    buildType: 'current'
+                    targetPath: $(Pipeline.Workspace)
+                - task: AzureCLI@2
+                  displayName: Deploy bicep file to create azure resources
+                  inputs:
+                    azureSubscription: 'CB-PROD'
+                    scriptType: ps
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      az deployment group create --resource-group '${{ variables.rgName }}' --template-file '$(Agent.BuildDirectory)/productcatalogapi-drop/Bicep/pc-main.bicep' --parameters functionname='${{ variables.webappName }}'
+                - task: AzureFunctionApp@1
+                  displayName: 'Deploy Azure Function'
+                  inputs:
+                    azureSubscription: 'CB-PROD'
+                    appType: 'functionApp'
+                    appName: '${{ variables.webappName }}'
+                    deployToSlotOrASE: false
+                    resourceGroupName: '${{ variables.rgName }}'
+                    package: '$(Pipeline.Workspace)/**/ProductCatalogAPI.zip'
+                    deploymentMethod: 'auto'
