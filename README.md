@@ -5,6 +5,8 @@ Change 1
 
 Change 2
 
+Change 3
+
 # Getting Started
 TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
 1.	Installation process
