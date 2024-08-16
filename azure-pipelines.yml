@@ -9,11 +9,20 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+    - stage: Build_Test
+      displayName: 'Build and Test'
+      jobs:
+        - job: Build_Test
+          steps:
+            - task: DotNetCoreCLI@2
+              displayName: 'Build code'
+              inputs:
+                command: 'build'
+                projects: '**/*.csproj'
+                configuration: 'Release'
+            - task: DotNetCoreCLI@2
+              displayName: 'Test'
+              inputs:
+                command: 'test'
+                projects: '**/*Tests/*.csproj'
