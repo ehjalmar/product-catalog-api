@@ -39,5 +39,19 @@ namespace ProductCatalogAPI_2.Controllers
 
             return Ok("Secret stored successfully.");
         }
+
+        [HttpPost("log-message")]
+        public IActionResult LogMessage([FromBody] LogMessage logMessage)
+        {
+            // SAFE EXAMPLE: Avoiding uncontrolled format string
+            string logEntry = logMessage.Message;
+            System.IO.File.AppendAllText("log.txt", logEntry + "\n");
+
+            return Ok("Message logged successfully.");
+        }
+    }
+    public class LogMessage
+    {
+        public string Message { get; set; }
     }
 }
