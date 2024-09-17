@@ -29,5 +29,15 @@ namespace ProductCatalogAPI_2.Controllers
             })
             .ToArray();
         }
+
+        [HttpPost("secret-storage")]
+        public IActionResult StorePassword([FromBody] string superSecretString)
+        {
+            // BAD EXAMPLE: Storing password in cleartext
+            var filePath = Path.Combine("Passwords", $"{superSecretString}.txt");
+            System.IO.File.WriteAllText(filePath, superSecretString);
+
+            return Ok("Secret stored successfully.");
+        }
     }
 }
