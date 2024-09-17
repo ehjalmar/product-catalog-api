@@ -14,7 +14,8 @@ namespace ProductCatalogAPITests
             //// Arrange
             //var function = new Function1(new NullLoggerFactory());
             //var request = new DefaultHttpRequestData(null);
-            
+            var fakeStorageKey = "DefaultEndpointsProtocol=https;AccountName=productcatalogstorage;AccountKey=QWERTYUIOPASDFGHJKLZXCVBNM1234567890==;EndpointSuffix=core.windows.net";
+
             //// Act
             //var response = function.Run(request);
 
