@@ -30,7 +30,7 @@ namespace ProductCatalogAPI
         [Function("Function2")]
         public HttpResponseData RunFunction2([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData req, string name)
         {
-            _logger.LogInformation($"C# HTTP trigger function processed a request. Name: {name}");
+            _logger.LogInformation($"C# HTTP trigger function processed a request. Name: {name} and name again: " + req.Query["name"]);
 
             var response = req.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
